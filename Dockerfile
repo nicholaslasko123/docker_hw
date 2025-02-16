@@ -1,21 +1,24 @@
-FROM ubuntu
+FROM python:3.9-slim
 
-LABEL maintainer="nlaskowski25@students.claremontmckenna.edu"
+# Set metadata information
+LABEL maintainer="azhou4013@lambda.compute.cmc.edu"
 
+# Update package list and install required system dependencies
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
 WORKDIR /app
 
-RUN apt-get update -y && \
-    apt-get install -y python3 python3-pip python3-venv
+# Copy and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./requirements.txt /app/requirements.txt
+# Copy all application files
+COPY . .
 
-RUN python3 -m venv venv && \
-    venv/bin/pip install -r requirements.txt
-
-COPY . /app
-
-ENV PATH="/app/venv/bin:$PATH"
-
-ENTRYPOINT [ "python" ]
-CMD [ "app.py" ]
+# Set entrypoint and default command
+ENTRYPOINT ["python"]
+CMD ["app.py"]
 
